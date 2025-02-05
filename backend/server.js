@@ -40,6 +40,11 @@ io.on("connection", (socket) => {
     console.log("User disconnected");
   });
 });
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+
 
 server.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
