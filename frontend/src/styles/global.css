@@ -1,0 +1,28 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-100 text-gray-900; 
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold; 
+}
+
+button {
+  @apply px-4 py-2 rounded font-medium transition-all;
+}
+
+button:hover {
+  @apply bg-opacity-80; 
+}
+
+
+input {
+  @apply border border-gray-300 rounded p-2 outline-none focus:border-blue-500; 
+}
+
+
