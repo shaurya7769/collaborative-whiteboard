@@ -1,6 +1,6 @@
 
 // frontend/pages/api/getSession.js
-import db from '../../backend/db';
+import db from './db';
 
 export default async function handler(req, res) {
   if (req.method === 'GET') {
