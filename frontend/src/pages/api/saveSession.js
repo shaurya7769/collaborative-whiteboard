@@ -1,5 +1,5 @@
 // frontend/pages/api/saveSession.js
-import { db } from '../../../db'; // Import your database connection
+import db from '../../backend/db';
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
