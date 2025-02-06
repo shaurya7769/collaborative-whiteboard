@@ -1,74 +1,76 @@
-import { useState, useEffect, useRef } from "react";
-import { fabric } from "fabric";
-import io from "socket.io-client";
-import "../src/styles/styles.css";  
-
+import React, { useRef, useEffect, useState } from "react";
 
 const Whiteboard = () => {
   const canvasRef = useRef(null);
-  const [canvas, setCanvas] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [context, setContext] = useState(null);
 
-  
   useEffect(() => {
-    const newCanvas = new fabric.Canvas(canvasRef.current, {
-      width: 1920,  // Canvas width
-      height: 1080, // Canvas height
-    });
-    setCanvas(newCanvas);
-
-  
-    const socket = io("http://localhost:5000");
-
-    // Listen for drawing events from other users
-    socket.on("draw", (data) => {
-      const { x, y } = data;
-      const circle = new fabric.Circle({
-        radius: 5,
-        left: x,
-        top: y,
-        fill: "red",
-        selectable: false,
-      });
-      newCanvas.add(circle);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
+    const canvas = canvasRef.current;
+    canvas.width = 1920;
+    canvas.height = 1080;
+    const ctx = canvas.getContext("2d");
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.lineCap = "round";
+    setContext(ctx);
   }, []);
 
-  // Function to clear the canvas
-  const clearCanvas = () => {
-    canvas.clear();
+  const startDrawing = (e) => {
+    if (!context) return;
+    setIsDrawing(true);
+    context.beginPath();
+    context.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
   };
 
-  const saveCanvas = async () => {
-    const canvasData = canvas.toDataURL(); 
+  const draw = (e) => {
+    if (!isDrawing || !context) return;
+    context.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
+    context.stroke();
+  };
 
-    // Send canvas data to the backend API to save the session
-    const response = await fetch("http://localhost:5000/api/saveSession", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image: canvasData }),
-    });
+  const stopDrawing = () => {
+    if (!context) return;
+    setIsDrawing(false);
+    context.closePath();
+  };
 
-    if (response.ok) {
-      console.log("Session saved successfully");
-    } else {
-      console.error("Failed to save session");
-    }
+  // ✅ Clears the Canvas
+  const clearCanvas = () => {
+    if (!context) return;
+    context.clearRect(0, 0, 1920, 1080);
+  };
+
+  // ✅ Saves Canvas as Image
+  const saveCanvas = () => {
+    const canvas = canvasRef.current;
+    const dataURL = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = dataURL;
+    link.download = "whiteboard.png";
+    link.click();
   };
 
   return (
-    <div className="whiteboard-container">
-      <canvas id="whiteboard" width="1920" height="1080"></canvas>
-      <div className="button-container">
-        <button className="clear-btn" onClick={handleClear}>
+    <div className="flex flex-col items-center p-4">
+      <h1 className="text-2xl font-bold mb-4">Collaborative Whiteboard</h1>
+      
+      {/* Whiteboard Canvas */}
+      <canvas
+        ref={canvasRef}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+        className="border border-gray-300 bg-white"
+      />
+
+      {/* Buttons for Clear & Save */}
+      <div className="mt-4 flex space-x-4">
+        <button onClick={clearCanvas} className="bg-red-500 text-white px-4 py-2 rounded">
           Clear
         </button>
-        <button className="save-btn" onClick={handleSave}>
+        <button onClick={saveCanvas} className="bg-blue-500 text-white px-4 py-2 rounded">
           Save
         </button>
       </div>
