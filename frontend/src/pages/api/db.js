@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
+import { Sequelize } from 'sequelize';
 
 const { Sequelize, DataTypes } = require('sequelize');
 
