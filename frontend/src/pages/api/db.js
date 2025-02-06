@@ -1,11 +1,12 @@
-// db.js
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 
 const { Sequelize, DataTypes } = require('sequelize');
 
 // Initialize Sequelize with SQLite
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './whiteboard.db',  // Path to the SQLite database file
+  storage: './whiteboard.db',  
 });
 
 // Define the Session model (table)
@@ -33,16 +34,16 @@ const Session = sequelize.define('Session', {
   },
 });
 
-// Sync the database (create tables if they don't exist)
+
 const syncDb = async () => {
   try {
-    await sequelize.sync({ force: false });  // 'force: false' will not drop existing tables
+    await sequelize.sync({ force: false });  
     console.log('Database synced!');
   } catch (error) {
     console.error('Error syncing database:', error);
   }
 };
 
-syncDb(); // Run sync to create tables
+syncDb(); 
 
 module.exports = { sequelize, Session };
